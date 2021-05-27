@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {  StatusBar } from 'react-native';
 import { useFonts, Jost_400Regular,Jost_600SemiBold } from '@expo-google-fonts/jost';
 import AppLoading from 'expo-app-loading';
@@ -12,21 +12,27 @@ const App = () =>{
     Jost_400Regular,
     Jost_600SemiBold,
   });
+  
+  const requestIosPermission =  useCallback(async () =>{
+    await Notifications.requestPermissionsAsync({
+      ios: {
+        allowAlert: true,
+        allowBadge: true,
+        allowSound: true,
+        allowAnnouncements: true,
+      },
+    }); 
+  },[])
 
   useEffect(() =>{
-    // const subscription = Notifications.addNotificationReceivedListener(
-    //   async notification =>{
-    //     const data= notification.request.content.data.plant as PlantProps
-    //     console.log(data)
-    // })
+    requestIosPermission();
+    
+    const subscription = Notifications.addNotificationReceivedListener(
+      async notification =>{
+        const data= notification.request.content.data.plant as PlantProps
+    })
 
-    // return () => subscription.remove()
-
-    async function notifications(){
-      const data = await Notifications.getAllScheduledNotificationsAsync();
-      console.log({data})
-    }
-    notifications()
+    return () => subscription.remove()
   },[])
 
   if (!fontsLoaded) {
